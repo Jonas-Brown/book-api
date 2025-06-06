@@ -114,8 +114,8 @@ public class BookServiceImpl implements BookService {
         if (file != null) {
             String[] vals = new String[2];
             vals = handleFileIssue(bookCover, file);
-            vals[0] = bookCover;
-            vals[1] = bookCoverUrl;
+            bookCover = vals[0];
+            bookCoverUrl = vals[1];
         }
 
         bookDto.setBookCover(bookCover);
