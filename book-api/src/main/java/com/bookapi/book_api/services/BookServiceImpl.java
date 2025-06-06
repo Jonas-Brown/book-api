@@ -36,15 +36,21 @@ public class BookServiceImpl implements BookService {
     // need to make it handle a null file
     @Override
     public BookDto addBook(BookDto bookDto, MultipartFile file) throws IOException {
-        if (Files.exists(Paths.get(path + File.separator + file.getOriginalFilename()))) {
-            throw new FileAlreadyExistsException("File already exists! Please give another file!");
+        // look at potentially throwing this back to the front end for an update
+        if (bookRepository.existsById(bookDto.getIsbn()))
+            return updateBook(bookDto.getIsbn(), bookDto, file);
+
+        if (file != null) {
+            if (Files.exists(Paths.get(path + File.separator + file.getOriginalFilename()))) {
+                throw new FileAlreadyExistsException("File already exists! Please give another file!");
+            }
+
+            String uploadedFileName = fileService.uploadFile(path, file);
+            String bookCoverUrl = baseUrl + "/api/v1/file/" + uploadedFileName;
+
+            bookDto.setBookCover(uploadedFileName);
+            bookDto.setBookCoverUrl(bookCoverUrl);
         }
-
-        String uploadedFileName = fileService.uploadFile(path, file);
-        String bookCoverUrl = baseUrl + "/api/v1/file/" + uploadedFileName;
-
-        bookDto.setBookCover(uploadedFileName);
-        bookDto.setBookCoverUrl(bookCoverUrl);
 
         // swaps over to book to be sent to DB and then swapped back
         Book book = convertToBook(bookDto);

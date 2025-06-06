@@ -1,0 +1,5 @@
+The API runs on port 8080 and the ui runs on port 5173
+Both front end and backend need their own .env files which need the following:
+
+- react has VITE_BACKEND_URL
+- java has DB_USERNAME, DB_PASSWORD, DB_URL=jdbc:postgresql://localhost:(port/db name), and DB_NAME
