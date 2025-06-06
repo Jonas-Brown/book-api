@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router";
-//TODO add the about page to center screen on normal
+//TODO add the about page to center screen on desktop
 //TODO add an actual login page to interact with authentication API you are creating
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);

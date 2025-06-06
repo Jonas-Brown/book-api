@@ -2,7 +2,7 @@ import { useState } from "react";
 import { addBook } from "../services/book.service";
 import { useNavigate } from "react-router";
 
-//this function isn't working with axios to send stuff
+//TODO make better ui and remove ability for error on sending
 function AddBook() {
   const navigate = useNavigate();
 
@@ -106,12 +106,14 @@ function AddBook() {
                     ISBN
                   </label>
                   <input
-                    type="text"
+                    required
+                    type="number"
                     name="isbn"
                     value={formData.isbn}
                     onChange={handleFormDataChange}
                     className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2
-            focus:ring-blue-500 focus:border-transparent transition duration-200"
+            focus:ring-blue-500 focus:border-transparent transition duration-200 [appearance:textfield]
+             [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                     placeholder="Enter ISBN"
                   />
                 </div>
@@ -122,6 +124,7 @@ function AddBook() {
                     Title
                   </label>
                   <input
+                    required
                     type="text"
                     name="title"
                     value={formData.title}
@@ -138,6 +141,7 @@ function AddBook() {
                     Author
                   </label>
                   <input
+                    required
                     type="text"
                     name="author"
                     value={formData.author}
@@ -154,6 +158,7 @@ function AddBook() {
                     Category
                   </label>
                   <input
+                    required
                     type="text"
                     name="category"
                     value={formData.category}
@@ -177,12 +182,14 @@ function AddBook() {
                         $
                       </span>
                       <input
-                        type="text"
+                        required
+                        type="number"
                         name="price"
                         value={formData.price}
                         onChange={handleFormDataChange}
                         className="w-full pl-8 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2
-                focus:ring-blue-500 focus:border-transparent transition duration-200"
+                focus:ring-blue-500 focus:border-transparent transition duration-200 [appearance:textfield]
+                 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                         placeholder="0.00"
                       />
                     </div>
@@ -193,13 +200,15 @@ function AddBook() {
                       Quantity
                     </label>
                     <input
+                      required
                       type="number"
                       name="quantity"
                       value={formData.quantity}
                       onChange={handleFormDataChange}
                       min="0"
                       className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2
-              focus:ring-blue-500 focus:border-transparent transition duration-200"
+              focus:ring-blue-500 focus:border-transparent transition duration-200 [appearance:textfield]
+               [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                       placeholder="0"
                     />
                   </div>
@@ -211,6 +220,7 @@ function AddBook() {
                     Description
                   </label>
                   <textarea
+                    required
                     name="description"
                     value={formData.description}
                     onChange={handleFormDataChange}
