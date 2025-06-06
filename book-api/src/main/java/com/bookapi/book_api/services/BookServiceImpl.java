@@ -6,6 +6,7 @@ import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -75,6 +76,33 @@ public class BookServiceImpl implements BookService {
                 .toList();
     }
 
+    private String[] handleFileIssue(String bookCover, MultipartFile file) throws IOException {
+        String bookCoverRes;
+        String bookCoverUrlRes;
+
+        CompletableFuture.runAsync(() -> {
+            try {
+                Files.deleteIfExists(Paths.get(path + File.separator + bookCover));
+
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        CompletableFuture<String> innerBookCover = CompletableFuture
+                .completedFuture(fileService.uploadFile(path, file));
+        CompletableFuture<String> innerBookCoverUrl = CompletableFuture
+                .completedFuture(baseUrl + "/api/v1/file/" + bookCover);
+
+        try {
+            bookCoverRes = innerBookCover.get();
+            bookCoverUrlRes = innerBookCoverUrl.get();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        return new String[] { bookCoverRes, bookCoverUrlRes };
+    }
+
     // does file requirement check
     @Override
     public BookDto updateBook(Long isbn, BookDto bookDto, MultipartFile file) throws IOException {
@@ -84,9 +112,10 @@ public class BookServiceImpl implements BookService {
         String bookCoverUrl = book.getBookCoverUrl();
 
         if (file != null) {
-            Files.deleteIfExists(Paths.get(path + File.separator + bookCover));
-            bookCover = fileService.uploadFile(path, file);
-            bookCoverUrl = baseUrl + "/api/v1/file/" + bookCover;
+            String[] vals = new String[2];
+            vals = handleFileIssue(bookCover, file);
+            vals[0] = bookCover;
+            vals[1] = bookCoverUrl;
         }
 
         bookDto.setBookCover(bookCover);

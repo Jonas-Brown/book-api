@@ -1,9 +1,17 @@
 import { useEffect, useState } from "react";
-import { getAllBooks } from "../services/book.service";
+import { deleteBook, getAllBooks, updateBook } from "../services/book.service";
 import { type BookDto } from "../types/BookDto";
+import EditBook from "./EditBook";
+import DeleteBook from "./DeleteBook";
 
 function Home() {
   const [books, setBooks] = useState<BookDto[]>([]);
+
+  const [isEditDialogue, setIsEditDialogue] = useState(false);
+  const [bookToEdit, setBookToEdit] = useState<BookDto | null>(null);
+
+  const [isDeleteDialogue, setIsDeleteDialogue] = useState(false);
+  const [bookToDelete, setBookToDelete] = useState<BookDto | null>(null);
 
   useEffect(() => {
     getBooks();
@@ -20,9 +28,55 @@ function Home() {
       });
   };
 
-  const handleEdit = (book: BookDto) => {};
+  const handleEdit = (book: BookDto) => {
+    setBookToEdit(book);
+    setIsEditDialogue(true);
+  };
 
-  const handleDelete = (book: BookDto) => {};
+  const handleOnCloseEdit = () => {
+    setBookToEdit(null);
+    setIsEditDialogue(false);
+  };
+
+  const handleUpdateBook = (updatedBook: BookDto, bookCoverFile?: File) => {
+    const submitData = new FormData();
+    submitData.append("bookDtoJson", JSON.stringify(updatedBook));
+    if (bookCoverFile) {
+      submitData.append("file", bookCoverFile);
+    }
+
+    updateBook(submitData, updatedBook.isbn)
+      .then((response) => {
+        console.log("Update book response = ", response);
+        getBooks();
+        handleOnCloseEdit();
+      })
+      .catch((error) => {
+        console.log("Error updating book: ", error);
+      });
+  };
+
+  const handleDeleteDialogue = (book: BookDto) => {
+    setBookToDelete(book);
+    setIsDeleteDialogue(true);
+  };
+
+  const handleDelete = (isbn: number) => {
+    deleteBook(isbn)
+      .then((response) => {
+        console.log("Delete book response = ", response);
+        getBooks();
+        handleOnCloseDelete();
+      })
+      .catch((error) => {
+        console.log("Error updating book: ", error);
+      });
+  };
+
+  const handleOnCloseDelete = () => {
+    setBookToDelete(null);
+    setIsDeleteDialogue(false);
+  };
 
   return (
     <>
@@ -50,7 +104,7 @@ function Home() {
                 </button>
                 <button
                   className="flex-1 bg-red-600 text-white py-1 px-1 rounded-md"
-                  onClick={() => handleDelete(book)}
+                  onClick={() => handleDeleteDialogue(book)}
                 >
                   Delete
                 </button>
@@ -59,6 +113,24 @@ function Home() {
           ))}
         </div>
       </div>
+
+      {bookToEdit && (
+        <EditBook
+          book={bookToEdit}
+          isOpen={isEditDialogue}
+          onClose={handleOnCloseEdit}
+          onSubmit={handleUpdateBook}
+        />
+      )}
+
+      {bookToDelete && (
+        <DeleteBook
+          book={bookToDelete}
+          isOpen={isDeleteDialogue}
+          onClose={handleOnCloseDelete}
+          onDelete={handleDelete}
+        />
+      )}
     </>
   );
 }

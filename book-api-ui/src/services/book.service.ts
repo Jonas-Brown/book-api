@@ -10,3 +10,11 @@ export const getAllBooks = async () => {
 export const addBook = async (formData: FormData) => {
     return await axios.post(`${BASE_URL}/api/v1/books/add-book`, formData)
 }
+
+export const updateBook = async (formData: FormData, isbn: number) => {
+    return await axios.put(`${BASE_URL}/api/v1/books/update-book/${isbn}`, formData)
+}
+
+export const deleteBook = async (isbn: number) => {
+    return await axios.delete(`${BASE_URL}/api/v1/books/delete/${isbn}`)
+}

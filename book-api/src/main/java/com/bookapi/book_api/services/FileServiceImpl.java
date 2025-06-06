@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.concurrent.CompletableFuture;
 
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -26,8 +27,14 @@ public class FileServiceImpl implements FileService {
             f.mkdir();
         }
 
-        // copy file to path
-        Files.copy(file.getInputStream(), Paths.get(filePath));
+        CompletableFuture.runAsync(() -> {
+            try {
+                // copy file to path
+                Files.copy(file.getInputStream(), Paths.get(filePath));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
 
         return filename;
     }
