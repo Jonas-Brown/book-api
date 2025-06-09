@@ -24,22 +24,22 @@ public class BookDto {
     @Id
     private Long isbn;
 
-    @NotBlank(message = "This field is required")
+    @NotBlank(message = "The title field is required")
     private String title;
 
-    @NotBlank(message = "This field is required")
+    @NotBlank(message = "The author field is required")
     private String author;
 
-    @NotBlank(message = "This field is required")
+    @NotBlank(message = "The description field is required")
     private String description;
 
-    @NotBlank(message = "This field is required")
+    @NotBlank(message = "The category is required")
     private String category;
 
-    @NotNull(message = "This field is required")
+    @NotNull(message = "The price field is required")
     private Double price;
 
-    @NotNull(message = "This field is required")
+    @NotNull(message = "The quantity field is required")
     private Integer quantity;
 
     private String bookCover;

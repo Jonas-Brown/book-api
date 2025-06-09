@@ -24,27 +24,27 @@ public class Book {
     private Long isbn;
 
     @Column(nullable = false)
-    @NotBlank(message = "This field is required")
+    @NotBlank(message = "The title field is required")
     private String title;
 
     @Column(nullable = false)
-    @NotBlank(message = "This field is required")
+    @NotBlank(message = "The author field is required")
     private String author;
 
     @Column(nullable = false)
-    @NotBlank(message = "This field is required")
+    @NotBlank(message = "The description field is required")
     private String description;
 
     @Column(nullable = false)
-    @NotBlank(message = "This field is required")
+    @NotBlank(message = "The category is required")
     private String category;
 
     @Column(nullable = false)
-    @NotNull(message = "This field is required")
+    @NotNull(message = "The price field is required")
     private Double price;
 
     @Column(nullable = false)
-    @NotNull(message = "This field is required")
+    @NotNull(message = "The quantity field is required")
     private Integer quantity;
 
     private String bookCover;

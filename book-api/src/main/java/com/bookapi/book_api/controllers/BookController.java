@@ -10,6 +10,7 @@ import com.bookapi.book_api.services.BookService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
@@ -28,13 +29,10 @@ import org.springframework.web.bind.annotation.PutMapping;
 @RestController
 @RequestMapping("api/v1/books")
 @CrossOrigin(origins = "http://localhost:5173")
+@RequiredArgsConstructor
 public class BookController {
 
     private final BookService bookService;
-
-    public BookController(BookService bookService) {
-        this.bookService = bookService;
-    }
 
     // doesn't handle when a new file is sent or no file is sent. Is close though
     @PostMapping("/add-book")
