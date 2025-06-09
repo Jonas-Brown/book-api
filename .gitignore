@@ -56,6 +56,7 @@ build/
 
 #env files
 .env
-
+book-api/images/
 settings.json
+
 

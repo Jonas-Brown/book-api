@@ -1,4 +1,6 @@
 spring:
+  config:
+    import: optional:file:.env[.properties]
   datasource:
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
@@ -15,9 +17,9 @@ spring:
     multipart:
       max-file-size: 1000MB
       max-request-size: 1000MB
-# for some reason ${BASE_URL} from env variables isn't working
+
 base:
-  url: http://localhost:8080
+  url: ${BASE_URL}
 
 project:
   images: images/

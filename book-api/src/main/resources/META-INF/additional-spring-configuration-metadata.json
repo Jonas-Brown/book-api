@@ -1,0 +1,9 @@
+{"properties": [{"name":"project"},{
+  "name": "project.images",
+  "type": "java.lang.String",
+  "description": "A description for 'project.images'"
+},{"name": "base"},{
+  "name": "base.url",
+  "type": "java.lang.String",
+  "description": "A description for 'base.url'"
+}]}
