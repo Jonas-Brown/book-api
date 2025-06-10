@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.bookapi.book_api.dtos.BookDto;
@@ -16,7 +17,10 @@ import com.bookapi.book_api.entities.Book;
 import com.bookapi.book_api.exception.BookNotFoundException;
 import com.bookapi.book_api.repositories.BookRepository;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
+@RequiredArgsConstructor
 public class BookServiceImpl implements BookService {
 
     // gets location of the file
@@ -29,12 +33,8 @@ public class BookServiceImpl implements BookService {
     private final BookRepository bookRepository;
     private final FileService fileService;
 
-    public BookServiceImpl(BookRepository bookRepository, FileService fileService) {
-        this.bookRepository = bookRepository;
-        this.fileService = fileService;
-    }
-
     @Override
+    @Transactional
     public BookDto addBook(BookDto bookDto, MultipartFile file) throws IOException {
         // look at potentially throwing this back to the front end for an update
         if (bookRepository.existsById(bookDto.getIsbn()))
@@ -74,7 +74,7 @@ public class BookServiceImpl implements BookService {
                 .toList();
     }
 
-    // could throw the exceptions here cleaner
+    // could be named better
     private String handleFileIssue(String bookCover, MultipartFile file) throws IOException {
         String bookCoverRes = fileService.uploadFile(path, file);
         CompletableFuture.runAsync(() -> {
@@ -89,6 +89,7 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
+    @Transactional
     public BookDto updateBook(Long isbn, BookDto bookDto, MultipartFile file) throws IOException {
 
         Book book = bookRepository.findById(isbn)
@@ -116,6 +117,7 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
+    @Transactional
     public String deleteBook(Long isbn) throws IOException {
         Book book = bookRepository.findById(isbn)
                 .orElseThrow(() -> new BookNotFoundException(("Book not found with isbn: " + isbn)));
