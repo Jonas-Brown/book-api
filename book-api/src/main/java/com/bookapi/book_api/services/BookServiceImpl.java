@@ -41,20 +41,22 @@ public class BookServiceImpl implements BookService {
         if (bookRepository.existsById(bookDto.getIsbn()))
             return updateBook(bookDto.getIsbn(), bookDto, file);
 
+        String uploadedFileName = null;
+        String bookCoverUrl = null;
         if (file != null) {
             if (Files.exists(Paths.get(path + File.separator + file.getOriginalFilename()))) {
                 throw new FileAlreadyExistsException("File already exists! Please give another file!");
             }
 
-            String uploadedFileName = fileService.uploadFile(path, file);
-            String bookCoverUrl = baseUrl + "/api/v1/file/" + uploadedFileName;
+            uploadedFileName = fileService.uploadFile(path, file);
+            bookCoverUrl = baseUrl + "/api/v1/file/" + uploadedFileName;
 
-            bookDto.setBookCover(uploadedFileName);
-            bookDto.setBookCoverUrl(bookCoverUrl);
+            // bookDto.setBookCover(uploadedFileName);
+            // bookDto.setBookCoverUrl(bookCoverUrl);
         }
 
         // swaps over to book to be sent to DB and then swapped back
-        Book book = convertToBook(bookDto);
+        Book book = convertToBook(bookDto, uploadedFileName, bookCoverUrl);
 
         Book savedBook = bookRepository.save(book);
 
@@ -118,8 +120,8 @@ public class BookServiceImpl implements BookService {
             bookCoverUrl = vals[1];
         }
 
-        bookDto.setBookCover(bookCover);
-        bookDto.setBookCoverUrl(bookCoverUrl);
+        // bookDto.setBookCover(bookCover);
+        // bookDto.setBookCoverUrl(bookCoverUrl);
 
         book.setTitle(bookDto.getTitle());
         book.setAuthor(bookDto.getAuthor());
@@ -127,8 +129,8 @@ public class BookServiceImpl implements BookService {
         book.setDescription(bookDto.getDescription());
         book.setCategory(bookDto.getCategory());
         book.setQuantity(bookDto.getQuantity());
-        book.setBookCover(bookDto.getBookCover());
-        book.setBookCoverUrl(bookDto.getBookCoverUrl());
+        book.setBookCover(bookCover);
+        book.setBookCoverUrl(bookCoverUrl);
 
         Book updatedBook = bookRepository.save(book);
 
@@ -153,13 +155,11 @@ public class BookServiceImpl implements BookService {
                 .description(book.getDescription())
                 .category(book.getCategory())
                 .quantity(book.getQuantity())
-                .bookCover(book.getBookCover())
-                .bookCoverUrl(book.getBookCoverUrl())
                 .build();
 
     }
 
-    private Book convertToBook(BookDto bookDto) {
+    private Book convertToBook(BookDto bookDto, String bookCover, String bookCoverUrl) {
         return Book.builder()
                 .isbn(bookDto.getIsbn())
                 .title(bookDto.getTitle())
@@ -168,8 +168,8 @@ public class BookServiceImpl implements BookService {
                 .description(bookDto.getDescription())
                 .category(bookDto.getCategory())
                 .quantity(bookDto.getQuantity())
-                .bookCover(bookDto.getBookCover())
-                .bookCoverUrl(bookDto.getBookCoverUrl())
+                .bookCover(bookCover)
+                .bookCoverUrl(bookCoverUrl)
                 .build();
     }
 }
