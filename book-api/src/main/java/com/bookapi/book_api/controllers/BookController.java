@@ -36,7 +36,7 @@ public class BookController {
     // doesn't handle when a new file is sent or no file is sent. Is close though
     @PostMapping("/add-book")
     public ResponseEntity<BookDto> addBook(@RequestPart @Valid BookDto bookDto,
-            @RequestPart(required = false) @Valid MultipartFile file) throws IOException {
+            @RequestPart(required = false) MultipartFile file) throws IOException {
 
         if (file == null || file.isEmpty())
             file = null;
@@ -56,7 +56,7 @@ public class BookController {
 
     @PutMapping("update-book/{isbn}")
     public ResponseEntity<BookDto> updateBook(@PathVariable Long isbn,
-            @RequestPart(required = false) @Valid MultipartFile file, @RequestPart @Valid BookDto bookDto)
+            @RequestPart(required = false) MultipartFile file, @RequestPart @Valid BookDto bookDto)
             throws IOException {
         if (file == null || file.isEmpty())
             file = null;

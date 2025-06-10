@@ -1,20 +1,26 @@
-import axios from "axios";
-
-//swap the axios over to use base fetch
 const BASE_URL = import.meta.env.VITE_BACKEND_URL;
 
 export const getAllBooks = async () => {
-    return await axios.get(`${BASE_URL}/api/v1/books/all-books`)
+    return await fetch(`${BASE_URL}/api/v1/books/all-books`,{
+        method: "GET",
+    })
+    
 }
 
 export const addBook = async (formData: FormData) => {
-    return await axios.post(`${BASE_URL}/api/v1/books/add-book`, formData)
+    return await fetch(`${BASE_URL}/api/v1/books/add-book`, {
+        method: "POST",
+        body: formData,});
 }
 
 export const updateBook = async (formData: FormData, isbn: number) => {
-    return await axios.put(`${BASE_URL}/api/v1/books/update-book/${isbn}`, formData)
+    return await fetch(`${BASE_URL}/api/v1/books/update-book/${isbn}`, {
+        method: "PUT",
+        body: formData});
 }
 
 export const deleteBook = async (isbn: number) => {
-    return await axios.delete(`${BASE_URL}/api/v1/books/delete/${isbn}`)
+    return await fetch(`${BASE_URL}/api/v1/books/delete/${isbn}`, {
+        method: "DELETE",
+    });
 }

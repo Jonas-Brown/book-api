@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
 import { addBook } from "../services/book.service";
 import { useNavigate } from "react-router";
 
@@ -45,13 +45,18 @@ function AddBook() {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
 
     const submitData = new FormData();
 
     //the append name has to have exact same name as the backend to send properly
-    submitData.append("bookDtoJson", JSON.stringify(formData));
+    submitData.append(
+      "bookDto",
+      new Blob([JSON.stringify(formData)], {
+        type: "application/json",
+      })
+    );
 
     if (bookCoverFile) {
       submitData.append("file", bookCoverFile);

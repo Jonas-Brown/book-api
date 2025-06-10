@@ -20,8 +20,11 @@ function Home() {
   const getBooks = () => {
     getAllBooks()
       .then((response) => {
-        console.log("response = ", response.data);
-        setBooks(response.data);
+        console.log("Get all books response = ", response);
+        return response.json();
+      })
+      .then((data) => {
+        setBooks(data);
       })
       .catch((error) => {
         console.log("error = ", error);
@@ -40,7 +43,12 @@ function Home() {
 
   const handleUpdateBook = (updatedBook: BookDto, bookCoverFile?: File) => {
     const submitData = new FormData();
-    submitData.append("bookDtoJson", JSON.stringify(updatedBook));
+    submitData.append(
+      "bookDto",
+      new Blob([JSON.stringify(updatedBook)], {
+        type: "application/json",
+      })
+    );
     if (bookCoverFile) {
       submitData.append("file", bookCoverFile);
     }

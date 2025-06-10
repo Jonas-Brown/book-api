@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef, useState, type ChangeEvent } from "react";
 import type { BookDto } from "../types/BookDto";
 
 interface EditBookProps {
@@ -20,9 +20,7 @@ const EditBook = ({ book, isOpen, onClose, onSubmit }: EditBookProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFormDataChange = (
-    e:
-      | React.ChangeEvent<HTMLInputElement>
-      | React.ChangeEvent<HTMLTextAreaElement>
+    e: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLTextAreaElement>
   ) => {
     setFormData((prevState) => ({
       ...prevState,
@@ -30,7 +28,7 @@ const EditBook = ({ book, isOpen, onClose, onSubmit }: EditBookProps) => {
     }));
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       setBookCover(file);
