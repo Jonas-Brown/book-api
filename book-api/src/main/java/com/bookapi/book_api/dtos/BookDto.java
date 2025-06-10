@@ -1,11 +1,9 @@
 package com.bookapi.book_api.dtos;
 
 import jakarta.persistence.Id;
-import jakarta.validation.constraints.DecimalMin;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -21,12 +19,9 @@ import lombok.ToString;
 @Builder
 public class BookDto {
 
-    private static final int ISBN_LENGTH = 13;
-
     @Id
-    @NotBlank(message = "The isbn field is required")
-    @Size(min = ISBN_LENGTH, max = ISBN_LENGTH, message = "isbn must be 13 characters long")
-    @Min(0)
+    @NotNull(message = "The isbn field is required")
+    @Positive
     private Long isbn;
 
     @NotBlank(message = "The title field is required")
@@ -42,11 +37,11 @@ public class BookDto {
     private String category;
 
     @NotNull(message = "The price field is required")
-    @DecimalMin("0.00")
+    @Positive
     private Double price;
 
     @NotNull(message = "The quantity field is required")
-    @Min(0)
+    @Positive
     private Integer quantity;
 
 }

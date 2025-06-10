@@ -7,13 +7,13 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.bookapi.book_api.dtos.BookDto;
 import com.bookapi.book_api.entities.Book;
+import com.bookapi.book_api.exception.BookNotFoundException;
 import com.bookapi.book_api.repositories.BookRepository;
 
 @Service
@@ -34,7 +34,6 @@ public class BookServiceImpl implements BookService {
         this.fileService = fileService;
     }
 
-    // need to make it handle a null file
     @Override
     public BookDto addBook(BookDto bookDto, MultipartFile file) throws IOException {
         // look at potentially throwing this back to the front end for an update
@@ -50,9 +49,6 @@ public class BookServiceImpl implements BookService {
 
             uploadedFileName = fileService.uploadFile(path, file);
             bookCoverUrl = baseUrl + "/api/v1/file/" + uploadedFileName;
-
-            // bookDto.setBookCover(uploadedFileName);
-            // bookDto.setBookCoverUrl(bookCoverUrl);
         }
 
         // swaps over to book to be sent to DB and then swapped back
@@ -66,7 +62,7 @@ public class BookServiceImpl implements BookService {
     @Override
     public BookDto getBook(Long isbn) {
         Book book = bookRepository.findById(isbn)
-                .orElseThrow(() -> new RuntimeException("Book not found with isbn : " + isbn));
+                .orElseThrow(() -> new BookNotFoundException("Book not found with isbn : " + isbn));
         return convertToBookDto(book);
     }
 
@@ -78,10 +74,9 @@ public class BookServiceImpl implements BookService {
                 .toList();
     }
 
-    private String[] handleFileIssue(String bookCover, MultipartFile file) throws IOException {
-        String bookCoverRes;
-        String bookCoverUrlRes;
-
+    // could throw the exceptions here cleaner
+    private String handleFileIssue(String bookCover, MultipartFile file) throws IOException {
+        String bookCoverRes = fileService.uploadFile(path, file);
         CompletableFuture.runAsync(() -> {
             try {
                 Files.deleteIfExists(Paths.get(path + File.separator + bookCover));
@@ -90,38 +85,21 @@ public class BookServiceImpl implements BookService {
                 throw new RuntimeException(e);
             }
         });
-        CompletableFuture<String> innerBookCover = CompletableFuture
-                .completedFuture(fileService.uploadFile(path, file));
-        CompletableFuture<String> innerBookCoverUrl = CompletableFuture
-                .completedFuture(baseUrl + "/api/v1/file/" + bookCover);
-
-        try {
-            bookCoverRes = innerBookCover.get();
-            bookCoverUrlRes = innerBookCoverUrl.get();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-
-        return new String[] { bookCoverRes, bookCoverUrlRes };
+        return bookCoverRes;
     }
 
-    // does file requirement check
     @Override
     public BookDto updateBook(Long isbn, BookDto bookDto, MultipartFile file) throws IOException {
+
         Book book = bookRepository.findById(isbn)
-                .orElseThrow(() -> new RuntimeException(("Book not found with isbn: " + isbn)));
+                .orElseThrow(() -> new BookNotFoundException(("Book not found with isbn: " + isbn)));
         String bookCover = book.getBookCover();
         String bookCoverUrl = book.getBookCoverUrl();
 
         if (file != null) {
-            String[] vals = new String[2];
-            vals = handleFileIssue(bookCover, file);
-            bookCover = vals[0];
-            bookCoverUrl = vals[1];
+            bookCover = handleFileIssue(bookCover, file);
+            bookCoverUrl = baseUrl + "/api/v1/file/" + bookCover;
         }
-
-        // bookDto.setBookCover(bookCover);
-        // bookDto.setBookCoverUrl(bookCoverUrl);
 
         book.setTitle(bookDto.getTitle());
         book.setAuthor(bookDto.getAuthor());
@@ -140,7 +118,7 @@ public class BookServiceImpl implements BookService {
     @Override
     public String deleteBook(Long isbn) throws IOException {
         Book book = bookRepository.findById(isbn)
-                .orElseThrow(() -> new RuntimeException(("Book not found with isbn: " + isbn)));
+                .orElseThrow(() -> new BookNotFoundException(("Book not found with isbn: " + isbn)));
         Files.deleteIfExists(Paths.get(path + File.separator + book.getBookCover()));
         bookRepository.delete(book);
         return "Book Deleted successfully with isbn : " + isbn;

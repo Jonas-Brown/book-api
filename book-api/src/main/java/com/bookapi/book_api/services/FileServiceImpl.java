@@ -12,11 +12,16 @@ import java.util.concurrent.CompletableFuture;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.bookapi.book_api.exception.BadImageRequestException;
+
 @Service
 public class FileServiceImpl implements FileService {
 
     @Override
     public String uploadFile(String path, MultipartFile file) throws IOException {
+        if (!file.getContentType().substring(0, 5).equals("image"))
+            throw new BadImageRequestException("Cannot accept non image files");
+
         String filename = file.getOriginalFilename();
 
         String filePath = path + File.separator + filename;

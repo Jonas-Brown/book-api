@@ -7,8 +7,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.bookapi.book_api.dtos.BookDto;
 import com.bookapi.book_api.services.BookService;
-// import com.fasterxml.jackson.core.JsonProcessingException;
-// import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +17,6 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -32,7 +29,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 @RequestMapping("api/v1/books")
 @CrossOrigin(origins = "http://localhost:5173")
 @RequiredArgsConstructor
-@Validated
 public class BookController {
 
     private final BookService bookService;
