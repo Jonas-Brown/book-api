@@ -1,5 +1,6 @@
 package com.bookapi.book_api.advice;
 
+import java.nio.file.FileAlreadyExistsException;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -39,6 +40,13 @@ public class GlobalExceptionHandler {
         ErrorResponse errorResponse = new ErrorResponse(LocalDateTime.now(), HttpStatus.BAD_REQUEST.value(),
                 "Not a valid image", ex.getMessage());
         return new ResponseEntity<ErrorResponse>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(FileAlreadyExistsException.class)
+    public ResponseEntity<ErrorResponse> handleFileAlreadyExistsException(FileAlreadyExistsException ex) {
+        ErrorResponse errorResponse = new ErrorResponse(LocalDateTime.now(), HttpStatus.CONFLICT.value(),
+                "Book Cover Image Already Exists", ex.getMessage());
+        return new ResponseEntity<ErrorResponse>(errorResponse, HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(BookNotFoundException.class)

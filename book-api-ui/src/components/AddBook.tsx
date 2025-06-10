@@ -64,10 +64,13 @@ function AddBook() {
 
     addBook(submitData)
       .then((response) => {
-        console.log("Add book response = ", response);
         handleReset();
         //navigates back to home page
         navigate("/");
+        return response.json();
+      })
+      .then((data) => {
+        console.log("Add book response = ", data);
       })
       .catch((error) => {
         console.log("Error adding book : ", error);

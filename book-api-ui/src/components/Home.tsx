@@ -4,6 +4,8 @@ import { type BookDto } from "../types/BookDto";
 import EditBook from "./EditBook";
 import DeleteBook from "./DeleteBook";
 
+//need to figure out a good way to throw errors in the UI to not continue on after an error
+
 function Home() {
   const [books, setBooks] = useState<BookDto[]>([]);
 
@@ -20,10 +22,10 @@ function Home() {
   const getBooks = () => {
     getAllBooks()
       .then((response) => {
-        console.log("Get all books response = ", response);
         return response.json();
       })
       .then((data) => {
+        console.log("Get all books response = ", data);
         setBooks(data);
       })
       .catch((error) => {
@@ -55,9 +57,12 @@ function Home() {
 
     updateBook(submitData, updatedBook.isbn)
       .then((response) => {
-        console.log("Update book response = ", response);
         getBooks();
         handleOnCloseEdit();
+        return response.json();
+      })
+      .then((data) => {
+        console.log("Update book response = ", data);
       })
       .catch((error) => {
         console.log("Error updating book: ", error);
@@ -72,9 +77,12 @@ function Home() {
   const handleDelete = (isbn: number) => {
     deleteBook(isbn)
       .then((response) => {
-        console.log("Delete book response = ", response);
         getBooks();
         handleOnCloseDelete();
+        return response.text();
+      })
+      .then((data) => {
+        console.log("Delete book response = ", data);
       })
       .catch((error) => {
         console.log("Error updating book: ", error);

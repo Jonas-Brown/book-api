@@ -44,4 +44,7 @@ public class BookDto {
     @Positive
     private Integer quantity;
 
+    private String bookCover;
+    private String bookCoverUrl;
+
 }
