@@ -1,12 +1,12 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { deleteBook, getAllBooks, updateBook } from "../services/book.service";
 import { type BookDto } from "../types/BookDto";
 import EditBook from "./EditBook";
 import DeleteBook from "./DeleteBook";
+import { AuthContext } from "../context/AuthContext";
 
 //need to figure out a good way to throw errors in the UI to not continue on after an error
-
-function Home() {
+const Home = () => {
   const [books, setBooks] = useState<BookDto[]>([]);
 
   const [isEditDialogue, setIsEditDialogue] = useState(false);
@@ -14,6 +14,8 @@ function Home() {
 
   const [isDeleteDialogue, setIsDeleteDialogue] = useState(false);
   const [bookToDelete, setBookToDelete] = useState<BookDto | null>(null);
+
+  const { isLoggedIn } = useContext(AuthContext);
 
   useEffect(() => {
     getBooks();
@@ -113,12 +115,14 @@ function Home() {
               </p>
               <div className="flex my-2">
                 <button
+                  hidden={!isLoggedIn}
                   className="flex-1 bg-yellow-600 text-white py-1 px-1 mr-2 rounded-md"
                   onClick={() => handleEdit(book)}
                 >
                   Edit
                 </button>
                 <button
+                  hidden={!isLoggedIn}
                   className="flex-1 bg-red-600 text-white py-1 px-1 rounded-md"
                   onClick={() => handleDeleteDialogue(book)}
                 >
@@ -149,6 +153,6 @@ function Home() {
       )}
     </>
   );
-}
+};
 
 export default Home;
