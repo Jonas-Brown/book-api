@@ -4,7 +4,6 @@ import com.bookapi.book_api.repositories.LibraryUserRepository;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -19,9 +18,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bookapi.book_api.entities.LibraryUser;
+import com.bookapi.book_api.exception.UserAlreadyExistsException;
 import com.bookapi.book_api.jwt.JwtUtils;
 import com.bookapi.book_api.jwt.LoginRequest;
 import com.bookapi.book_api.jwt.LoginResponse;
+import com.bookapi.book_api.jwt.RegisterRequest;
 
 import java.util.HashMap;
 import java.util.List;
@@ -37,7 +38,7 @@ public class JwtController {
     private final AuthenticationManager authenticationManager;
     private final JwtUtils jwtUtils;
 
-    @PostMapping(value = "/auth", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/auth")
     public ResponseEntity<?> createJwtToken(@RequestBody LoginRequest loginRequest) throws Exception {
         // Create Authenticate object (setup the username/pwd)
         Authentication authentication;
@@ -72,10 +73,56 @@ public class JwtController {
         return ResponseEntity.ok(new LoginResponse(jwtToken, userDetails.getUsername(), roles));
     }
 
-    // TODO invalidate reregistration if a user already exists
+    // TODO make sure that this is functional tomorrow
     @PostMapping("/register")
-    public LibraryUser createUser(@RequestBody LibraryUser user) {
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        return libraryUserRepository.save(user);
+    public ResponseEntity<?> createUser(@RequestBody RegisterRequest registerRequest) {
+        // could place this logic elsewhere
+        if (libraryUserRepository
+                .existsById(libraryUserRepository.findByEmail(registerRequest.getEmail()).get().getId())) {
+            throw new UserAlreadyExistsException("User already exists with email: " + registerRequest.getEmail());
+        }
+        LibraryUser user = LibraryUser.builder()
+                .firstName(registerRequest.getFirstName())
+                .lastName(registerRequest.getLastName())
+                .email(registerRequest.getEmail())
+                .password(registerRequest.getPassword())
+                .role(registerRequest.getRole())
+                .build();
+
+        user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
+        libraryUserRepository.save(user);
+
+        // Create Authenticate object (setup the username/pwd)
+        Authentication authentication;
+
+        try {
+            authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(registerRequest.getEmail(), registerRequest.getPassword()));
+
+        } catch (DisabledException e) {
+            Map<String, Object> errorMap = new HashMap<>();
+            errorMap.put("msg", "Account is diabled");
+            errorMap.put("status", false);
+            return new ResponseEntity<Object>(errorMap, HttpStatus.LOCKED);
+
+        } catch (BadCredentialsException e) {
+            Map<String, Object> errorMap = new HashMap<>();
+            errorMap.put("msg", "Invalid credentials");
+            errorMap.put("status", false);
+            return new ResponseEntity<Object>(errorMap, HttpStatus.UNAUTHORIZED);
+
+        }
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        // Authenticate the user name and pwd in the database
+        final UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        // If username is found for the given password then create jwt token
+        final String jwtToken = jwtUtils.generateToken(userDetails);
+        final List<String> roles = authentication.getAuthorities()
+                .stream()
+                .map(role -> role.getAuthority())
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(new LoginResponse(jwtToken, userDetails.getUsername(), roles));
+
     }
 }

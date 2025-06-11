@@ -22,8 +22,6 @@ public class LibraryUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         Optional<LibraryUser> user = libraryUserRepository.findByEmail(email);
-
-        System.out.println("Loading user by email: " + email);
         if (user.isPresent()) {
             var userObject = user.get();
             return User.builder()

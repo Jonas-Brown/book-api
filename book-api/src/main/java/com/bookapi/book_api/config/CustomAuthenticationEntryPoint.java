@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
-//TODO look into how this functions
 @Component
 public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
