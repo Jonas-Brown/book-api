@@ -17,6 +17,7 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -35,6 +36,7 @@ public class BookController {
 
     // doesn't handle when a new file is sent or no file is sent. Is close though
     @PostMapping("/add-book")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<BookDto> addBook(@RequestPart @Valid BookDto bookDto,
             @RequestPart(required = false) MultipartFile file) throws IOException {
 
@@ -45,16 +47,19 @@ public class BookController {
     }
 
     @GetMapping("/all-books")
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     public ResponseEntity<List<BookDto>> getAllBooks() {
         return ResponseEntity.ok(bookService.getAllBooks());
     }
 
     @GetMapping("/get-book/{isbn}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     public ResponseEntity<BookDto> getBook(@PathVariable Long isbn) {
         return ResponseEntity.ok(bookService.getBook(isbn));
     }
 
     @PutMapping("update-book/{isbn}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<BookDto> updateBook(@PathVariable Long isbn,
             @RequestPart(required = false) MultipartFile file, @RequestPart @Valid BookDto bookDto)
             throws IOException {
@@ -65,6 +70,7 @@ public class BookController {
     }
 
     @DeleteMapping("/delete/{isbn}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> deleteBook(@PathVariable Long isbn) throws IOException {
         return ResponseEntity.ok(bookService.deleteBook(isbn));
     }

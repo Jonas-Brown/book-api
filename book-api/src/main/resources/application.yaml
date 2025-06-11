@@ -20,6 +20,8 @@ spring:
 
 secret: ${SECRET_KEY}
 
+jwtExpirationInMs: 3600000
+
 base:
   url: ${BASE_URL}
 

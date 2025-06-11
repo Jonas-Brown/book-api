@@ -8,6 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.bookapi.book_api.services.FileService;
 
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 @RestController
 @RequestMapping("/api/v1/file")
 @CrossOrigin(origins = "http://localhost:5173")
+@RequiredArgsConstructor
 public class FileController {
 
     private final FileService fileService;
@@ -31,10 +33,6 @@ public class FileController {
     // gets the path from application.yaml file
     @Value("${project.images}")
     private String path;
-
-    public FileController(FileService fileService) {
-        this.fileService = fileService;
-    }
 
     @PostMapping("/upload")
     public ResponseEntity<String> uploadFile(@RequestPart MultipartFile file) throws IOException {
