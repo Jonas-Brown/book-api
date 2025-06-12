@@ -15,6 +15,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bookapi.book_api.entities.LibraryUser;
@@ -23,6 +24,7 @@ import com.bookapi.book_api.jwt.JwtUtils;
 import com.bookapi.book_api.jwt.LoginRequest;
 import com.bookapi.book_api.jwt.LoginResponse;
 import com.bookapi.book_api.jwt.RegisterRequest;
+import com.bookapi.book_api.jwt.RegisterResponse;
 
 import java.util.HashMap;
 import java.util.List;
@@ -31,6 +33,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("book-api")
 public class JwtController {
 
     private final LibraryUserRepository libraryUserRepository;
@@ -38,14 +41,14 @@ public class JwtController {
     private final AuthenticationManager authenticationManager;
     private final JwtUtils jwtUtils;
 
-    @PostMapping(value = "/auth")
+    @PostMapping(value = "/login")
     public ResponseEntity<?> createJwtToken(@RequestBody LoginRequest loginRequest) throws Exception {
         // Create Authenticate object (setup the username/pwd)
         Authentication authentication;
 
         try {
             authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(loginRequest.getUserName(), loginRequest.getPassword()));
+                    new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
 
         } catch (DisabledException e) {
             Map<String, Object> errorMap = new HashMap<>();
@@ -73,47 +76,33 @@ public class JwtController {
         return ResponseEntity.ok(new LoginResponse(jwtToken, userDetails.getUsername(), roles));
     }
 
-    // TODO make sure that this is functional tomorrow
-    @PostMapping("/register")
-    public ResponseEntity<?> createUser(@RequestBody RegisterRequest registerRequest) {
+    @PostMapping("/signup")
+    public ResponseEntity<?> createUser(@RequestBody RegisterRequest registerRequest) throws Exception {
         // could place this logic elsewhere
-        if (libraryUserRepository
-                .existsById(libraryUserRepository.findByEmail(registerRequest.getEmail()).get().getId())) {
-            throw new UserAlreadyExistsException("User already exists with email: " + registerRequest.getEmail());
+        if (libraryUserRepository.existsByEmail(registerRequest.getEmail())) {
+            throw new UserAlreadyExistsException("User already exists with email: " +
+                    registerRequest.getEmail());
         }
+
         LibraryUser user = LibraryUser.builder()
                 .firstName(registerRequest.getFirstName())
                 .lastName(registerRequest.getLastName())
                 .email(registerRequest.getEmail())
-                .password(registerRequest.getPassword())
-                .role(registerRequest.getRole())
+                .password(passwordEncoder.encode(registerRequest.getPassword()))
+                .roles(registerRequest.getRoles())
                 .build();
 
-        user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
         libraryUserRepository.save(user);
 
-        // Create Authenticate object (setup the username/pwd)
         Authentication authentication;
 
         try {
             authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(registerRequest.getEmail(), registerRequest.getPassword()));
-
-        } catch (DisabledException e) {
-            Map<String, Object> errorMap = new HashMap<>();
-            errorMap.put("msg", "Account is diabled");
-            errorMap.put("status", false);
-            return new ResponseEntity<Object>(errorMap, HttpStatus.LOCKED);
-
-        } catch (BadCredentialsException e) {
-            Map<String, Object> errorMap = new HashMap<>();
-            errorMap.put("msg", "Invalid credentials");
-            errorMap.put("status", false);
-            return new ResponseEntity<Object>(errorMap, HttpStatus.UNAUTHORIZED);
-
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
         }
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        // Authenticate the user name and pwd in the database
+
         final UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         // If username is found for the given password then create jwt token
         final String jwtToken = jwtUtils.generateToken(userDetails);
@@ -122,7 +111,7 @@ public class JwtController {
                 .map(role -> role.getAuthority())
                 .collect(Collectors.toList());
 
-        return ResponseEntity.ok(new LoginResponse(jwtToken, userDetails.getUsername(), roles));
-
+        return ResponseEntity
+                .ok(new RegisterResponse(jwtToken, user.getFirstName(), user.getLastName(), user.getEmail(), roles));
     }
 }

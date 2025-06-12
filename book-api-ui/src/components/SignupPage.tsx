@@ -2,21 +2,25 @@ import { useContext, useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { AuthContext } from "../context/AuthContext";
 
-const LoginPage = () => {
+const SignupPage = () => {
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
   const context = useContext(AuthContext);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleSignup = (e: React.FormEvent) => {
     e.preventDefault();
-
     const payload = {
+      firstName: firstName,
+      lastName: lastName,
       email: email,
       password: password,
+      roles: "USER", //default role
     };
 
-    fetch("/book-api/login", {
+    fetch("/book-api/signup", {
       method: "POST",
       body: JSON.stringify(payload),
       headers: {
@@ -38,17 +42,49 @@ const LoginPage = () => {
         //could add on screen error message
         console.error(err);
       });
-    // Handle login logic here
-    console.log("Logging in:", { email, password });
   };
 
   return (
-    <div className="max-h-screen bg-white flex items-start justify-center p-24 px-4">
+    <div className="max-h-screen bg-white flex items-start justify-center pt-24 px-4">
       <div className="w-full max-w-md bg-white p-8 rounded-lg shadow-2xl">
         <h2 className="text-3xl font-bold mb-6 text-center text-black">
-          Login to BookInfoApp
+          Create Your BookInfoApp Account
         </h2>
-        <form onSubmit={handleLogin} className="space-y-5">
+        <form onSubmit={handleSignup} className="space-y-5">
+          <div>
+            <label
+              htmlFor="firstName"
+              className="block mb-1 text-sm text-gray-700"
+            >
+              First Name
+            </label>
+            <input
+              type="text"
+              id="firstName"
+              className="w-full px-4 py-2 bg-white text-black border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              required
+            />
+          </div>
+
+          <div>
+            <label
+              htmlFor="lastName"
+              className="block mb-1 text-sm text-gray-700"
+            >
+              Last Name
+            </label>
+            <input
+              type="text"
+              id="lastName"
+              className="w-full px-4 py-2 bg-white text-black border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+              required
+            />
+          </div>
+
           <div>
             <label htmlFor="email" className="block mb-1 text-sm text-gray-700">
               Email
@@ -84,14 +120,14 @@ const LoginPage = () => {
             type="submit"
             className="w-full bg-black text-white font-semibold py-2 rounded-lg hover:bg-gray-800 transition"
           >
-            Login
+            Sign Up
           </button>
         </form>
 
         <p className="mt-6 text-center text-sm text-gray-600">
-          Don’t have an account?{" "}
-          <Link to="/signup" className="text-black font-medium hover:underline">
-            Sign up
+          Already have an account?{" "}
+          <Link to="/login" className="text-black font-medium hover:underline">
+            Log in
           </Link>
         </p>
       </div>
@@ -99,4 +135,4 @@ const LoginPage = () => {
   );
 };
 
-export default LoginPage;
+export default SignupPage;

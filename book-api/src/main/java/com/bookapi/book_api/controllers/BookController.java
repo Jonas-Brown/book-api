@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 
 @Slf4j
 @RestController
-@RequestMapping("api/v1/books")
+@RequestMapping("book-api")
 @CrossOrigin(origins = "http://localhost:5173")
 @RequiredArgsConstructor
 public class BookController {

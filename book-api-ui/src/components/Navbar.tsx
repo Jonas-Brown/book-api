@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router";
 //TODO add the about page to center screen on desktop
-//TODO add an actual login page to interact with authentication API you are creating
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   return (
@@ -25,9 +24,11 @@ const Navbar = () => {
 
         {/* Login Button */}
         <div className="hidden md:block">
-          <button className="bg-white text-black px-4 py-2 rounded-lg hover:bg-gray-200">
-            Login
-          </button>
+          <Link to="/login">
+            <button className="bg-white text-black px-4 py-2 rounded-lg hover:bg-gray-200">
+              Login
+            </button>
+          </Link>
         </div>
 
         {/* Mobile Menu Button */}

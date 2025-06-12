@@ -9,6 +9,6 @@ import java.util.List;
 @AllArgsConstructor
 public class LoginResponse {
     private String jwtToken;
-    private String userName;
+    private String email;
     private List<String> roles;
 }

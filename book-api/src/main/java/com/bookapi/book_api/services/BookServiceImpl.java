@@ -48,7 +48,7 @@ public class BookServiceImpl implements BookService {
             }
 
             uploadedFileName = fileService.uploadFile(path, file);
-            bookCoverUrl = baseUrl + "/api/v1/file/" + uploadedFileName;
+            bookCoverUrl = baseUrl + "/book-api/file/" + uploadedFileName;
         }
 
         bookDto.setBookCover(uploadedFileName);
@@ -101,7 +101,7 @@ public class BookServiceImpl implements BookService {
 
         if (file != null) {
             bookCover = handleFileIssue(bookCover, file);
-            bookCoverUrl = baseUrl + "/api/v1/file/" + bookCover;
+            bookCoverUrl = baseUrl + "/book-api/file/" + bookCover;
         }
 
         bookDto.setBookCover(bookCover);

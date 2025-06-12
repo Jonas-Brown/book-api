@@ -2,7 +2,6 @@ import { useState, type FormEvent } from "react";
 import { addBook } from "../services/book.service";
 import { useNavigate } from "react-router";
 
-//TODO make better ui and remove ability for error on sending
 function AddBook() {
   const navigate = useNavigate();
 

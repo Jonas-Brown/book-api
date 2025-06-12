@@ -35,10 +35,10 @@ public class LibraryUserDetailsService implements UserDetailsService {
     }
 
     private String[] getRoles(LibraryUser user) {
-        if (user.getRole() == null) {
+        if (user.getRoles() == null) {
             return new String[] { "USER" };
         }
-        return user.getRole().split(",");
+        return user.getRoles().split(",");
     }
 
 }

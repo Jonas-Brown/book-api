@@ -1,26 +1,30 @@
 const BASE_URL = import.meta.env.VITE_BACKEND_URL;
 
-export const getAllBooks = async () => {
-    return await fetch(`${BASE_URL}/api/v1/books/all-books`,{
+export const getAllBooks = async (token: string) => {
+    return await fetch(`${BASE_URL}/book-api/books/all-books`,{
         method: "GET",
+        headers: {Authorization: `Bearer ${token}`}
     })
     
 }
 
-export const addBook = async (formData: FormData) => {
-    return await fetch(`${BASE_URL}/api/v1/books/add-book`, {
+export const addBook = async (formData: FormData, token: string) => {
+    return await fetch(`${BASE_URL}/book-api/books/add-book`, {
         method: "POST",
+        headers: {Authorization: `Bearer ${token}`},
         body: formData,});
 }
 
-export const updateBook = async (formData: FormData, isbn: number) => {
-    return await fetch(`${BASE_URL}/api/v1/books/update-book/${isbn}`, {
+export const updateBook = async (formData: FormData, isbn: number, token: string) => {
+    return await fetch(`${BASE_URL}/book-api/books/update-book/${isbn}`, {
         method: "PUT",
+        headers: {Authorization: `Bearer ${token}`},
         body: formData});
 }
 
-export const deleteBook = async (isbn: number) => {
-    return await fetch(`${BASE_URL}/api/v1/books/delete/${isbn}`, {
+export const deleteBook = async (isbn: number, token:string) => {
+    return await fetch(`${BASE_URL}/book-api/books/delete/${isbn}`, {
         method: "DELETE",
+        headers: {Authorization: `Bearer ${token}`}
     });
 }

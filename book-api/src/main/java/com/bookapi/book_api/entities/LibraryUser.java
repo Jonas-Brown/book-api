@@ -20,11 +20,6 @@ import lombok.ToString;
 @NoArgsConstructor
 @Builder
 public class LibraryUser {
-    // public LibraryUser(String firstName, String lastName, String email) {
-    // this.firstName = firstName;
-    // this.lastName = lastName;
-    // this.email = email;
-    // }
 
     @Id
     @GeneratedValue
@@ -44,5 +39,5 @@ public class LibraryUser {
     private String password;
 
     @Column
-    private String role;
+    private String roles;
 }

@@ -31,8 +31,8 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/auth").permitAll()
-                        .requestMatchers("/register").permitAll()
+                        .requestMatchers("/book-api/login").permitAll()
+                        .requestMatchers("/book-api/signup").permitAll()
                         .anyRequest().authenticated())
                 // may be able to reduce some of this
                 .httpBasic(Customizer.withDefaults())
