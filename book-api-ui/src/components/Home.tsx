@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { deleteBook, getAllBooks, updateBook } from "../services/book.service";
 import { type BookDto } from "../types/BookDto";
 import EditBook from "./EditBook";
@@ -15,25 +15,29 @@ const Home = () => {
   const [isDeleteDialogue, setIsDeleteDialogue] = useState(false);
   const [bookToDelete, setBookToDelete] = useState<BookDto | null>(null);
 
-  const { isLoggedIn } = useContext(AuthContext);
+  const { authUser } = useContext(AuthContext);
 
-  useEffect(() => {
-    getBooks();
-  }, []);
+  const isAdmin = (authUser?.roles || "").includes("ROLE_ADMIN");
 
-  const getBooks = () => {
-    getAllBooks()
+  const getBooks = useCallback(() => {
+    getAllBooks(authUser?.token || "")
       .then((response) => {
         return response.json();
       })
       .then((data) => {
         console.log("Get all books response = ", data);
-        setBooks(data);
+        if (!("error" in data)) {
+          setBooks(data);
+        }
       })
       .catch((error) => {
         console.log("error = ", error);
       });
-  };
+  }, [authUser?.token]);
+
+  useEffect(() => {
+    getBooks();
+  }, [getBooks]);
 
   const handleEdit = (book: BookDto) => {
     setBookToEdit(book);
@@ -57,7 +61,7 @@ const Home = () => {
       submitData.append("file", bookCoverFile);
     }
 
-    updateBook(submitData, updatedBook.isbn)
+    updateBook(submitData, updatedBook.isbn, authUser?.token || "")
       .then((response) => {
         getBooks();
         handleOnCloseEdit();
@@ -77,7 +81,7 @@ const Home = () => {
   };
 
   const handleDelete = (isbn: number) => {
-    deleteBook(isbn)
+    deleteBook(isbn, authUser?.token || "")
       .then((response) => {
         getBooks();
         handleOnCloseDelete();
@@ -115,14 +119,14 @@ const Home = () => {
               </p>
               <div className="flex my-2">
                 <button
-                  hidden={!isLoggedIn}
+                  hidden={!isAdmin}
                   className="flex-1 bg-yellow-600 text-white py-1 px-1 mr-2 rounded-md"
                   onClick={() => handleEdit(book)}
                 >
                   Edit
                 </button>
                 <button
-                  hidden={!isLoggedIn}
+                  hidden={!isAdmin}
                   className="flex-1 bg-red-600 text-white py-1 px-1 rounded-md"
                   onClick={() => handleDeleteDialogue(book)}
                 >

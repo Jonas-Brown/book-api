@@ -1,4 +1,4 @@
-export interface BookDto {
+export type BookDto  ={
     isbn: number
     title: string
     author: string

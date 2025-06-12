@@ -29,7 +29,7 @@ public class JwtUtils implements Serializable {
     private String jwtExpirationInMs;
 
     public String getJwtDetailsFromHeader(HttpServletRequest request) {
-        String bearerToken = request.getHeader("Authorization");
+        String bearerToken = request.getHeader("authorization");
         if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
             return bearerToken.substring(7);
         } else {

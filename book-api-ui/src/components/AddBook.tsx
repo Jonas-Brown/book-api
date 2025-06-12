@@ -1,6 +1,7 @@
-import { useState, type FormEvent } from "react";
+import { useContext, useState, type FormEvent } from "react";
 import { addBook } from "../services/book.service";
 import { useNavigate } from "react-router";
+import { AuthContext } from "../context/AuthContext";
 
 function AddBook() {
   const navigate = useNavigate();
@@ -17,6 +18,7 @@ function AddBook() {
 
   const [bookCoverFile, setBookCoverFile] = useState<File | null>(null);
   const [bookCoverPreview, setBookCoverPreview] = useState<string>("");
+  const context = useContext(AuthContext);
 
   const handleFormDataChange = (
     e:
@@ -61,7 +63,7 @@ function AddBook() {
       submitData.append("file", bookCoverFile);
     }
 
-    addBook(submitData)
+    addBook(submitData, context.authUser?.token || "")
       .then((response) => {
         handleReset();
         //navigates back to home page
@@ -93,10 +95,10 @@ function AddBook() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
         <div className="bg-white rounded-3xl shadow-xl overflow-hidden">
-          <div className="bg-gradient-to-r from-blue-600 to-indigo-700 px-8 py-6">
+          <div className="bg-black px-8 py-6">
             <h1 className="text-3xl font-extrabold text-white text-center">
               Add New Book
             </h1>
@@ -119,7 +121,7 @@ function AddBook() {
                     value={formData.isbn}
                     onChange={handleFormDataChange}
                     className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2
-            focus:ring-blue-500 focus:border-transparent transition duration-200 [appearance:textfield]
+            focus:ring-black focus:border-transparent transition duration-200 [appearance:textfield]
              [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                     placeholder="Enter ISBN"
                   />
@@ -137,7 +139,7 @@ function AddBook() {
                     value={formData.title}
                     onChange={handleFormDataChange}
                     className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2
-            focus:ring-blue-500 focus:border-transparent transition duration-200"
+            focus:ring-black focus:border-transparent transition duration-200"
                     placeholder="Enter book title"
                   />
                 </div>
@@ -154,7 +156,7 @@ function AddBook() {
                     value={formData.author}
                     onChange={handleFormDataChange}
                     className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2
-            focus:ring-blue-500 focus:border-transparent transition duration-200"
+            focus:ring-black focus:border-transparent transition duration-200"
                     placeholder="Enter author name"
                   />
                 </div>
@@ -171,7 +173,7 @@ function AddBook() {
                     value={formData.category}
                     onChange={handleFormDataChange}
                     className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2
-            focus:ring-blue-500 focus:border-transparent transition duration-200"
+            focus:ring-black focus:border-transparent transition duration-200"
                     placeholder="Enter book category"
                   />
                 </div>
@@ -195,7 +197,7 @@ function AddBook() {
                         value={formData.price}
                         onChange={handleFormDataChange}
                         className="w-full pl-8 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2
-                focus:ring-blue-500 focus:border-transparent transition duration-200 [appearance:textfield]
+                focus:ring-black focus:border-transparent transition duration-200 [appearance:textfield]
                  [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                         placeholder="0.00"
                       />
@@ -214,7 +216,7 @@ function AddBook() {
                       onChange={handleFormDataChange}
                       min="0"
                       className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2
-              focus:ring-blue-500 focus:border-transparent transition duration-200 [appearance:textfield]
+              focus:ring-black focus:border-transparent transition duration-200 [appearance:textfield]
                [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                       placeholder="0"
                     />
@@ -233,7 +235,7 @@ function AddBook() {
                     onChange={handleFormDataChange}
                     rows={3}
                     className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2
-            focus:ring-blue-500 focus:border-transparent transition duration-200 resize-none"
+            focus:ring-black focus:border-transparent transition duration-200 resize-none"
                     placeholder="Enter book description"
                   ></textarea>
                 </div>
@@ -312,14 +314,14 @@ function AddBook() {
                 type="button"
                 onClick={handleReset}
                 className="px-6 py-3 border border-gray-300 rounded-xl text-gray-700 font-medium
-        hover:bg-gray-50 transition duration-200 shadow-sm"
+        hover:bg-gray-100 transition duration-200 shadow-sm"
               >
                 Reset Form
               </button>
               <button
                 type="submit"
-                className="px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl text-white font-medium
-        hover:from-blue-700 hover:to-indigo-700 transition duration-200 shadow-md"
+                className="px-8 py-3 bg-black rounded-xl text-white font-medium
+        hover:bg-gray-800 transition duration-200 shadow-md"
               >
                 Add Book
               </button>

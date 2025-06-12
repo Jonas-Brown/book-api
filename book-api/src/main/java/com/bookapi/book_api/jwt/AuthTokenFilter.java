@@ -49,7 +49,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
             // At this point user is authenticated and set in the context
             SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
         } else {
-            log.info("Jwt token seems invalid. ");
+            log.info("Jwt token seems invalid. " + jwtToken);
         }
         filterChain.doFilter(request, response);
     }

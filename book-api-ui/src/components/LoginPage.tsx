@@ -30,6 +30,7 @@ const LoginPage = () => {
           context.setAuthUser({
             token: json.jwtToken,
             email: json.email,
+            roles: json.roles,
           });
         }
         navigate("/");

@@ -7,28 +7,29 @@ type props = {
 type User = {
   token: string;
   email: string;
+  roles: string;
 };
 
 type AuthContextType = {
   authUser: User | null;
   setAuthUser: (value: User | null) => void;
-  isLoggedIn: boolean;
-  setIsLoggedIn: (value: boolean) => void;
 };
 
 const AuthContext = createContext<AuthContextType>({
   authUser: null,
   setAuthUser: () => {},
-  isLoggedIn: false,
-  setIsLoggedIn: () => {},
 });
 
 const AuthProvider = ({ children }: props) => {
   const [authUser, setAuthUser] = useState<User | null>(null);
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
 
   return (
-    <AuthContext value={{ authUser, setAuthUser, isLoggedIn, setIsLoggedIn }}>
+    <AuthContext
+      value={{
+        authUser,
+        setAuthUser,
+      }}
+    >
       {children}
     </AuthContext>
   );
