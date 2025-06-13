@@ -23,7 +23,9 @@ import com.bookapi.book_api.entities.LibraryUser;
 import com.bookapi.book_api.exception.UserAlreadyExistsException;
 import com.bookapi.book_api.jwt.JwtUtils;
 import com.bookapi.book_api.jwt.LoginRequest;
+import com.bookapi.book_api.jwt.LoginResponse;
 import com.bookapi.book_api.jwt.RegisterRequest;
+import com.bookapi.book_api.jwt.RegisterResponse;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -76,7 +78,7 @@ public class JwtController {
         }
         final String jwtToken = jwtUtils.generateToken(userDetails, firstName, lastName);
 
-        return ResponseEntity.ok(jwtToken);
+        return ResponseEntity.ok(new LoginResponse(jwtToken));
     }
 
     @PostMapping("/signup")
@@ -111,6 +113,6 @@ public class JwtController {
         final String jwtToken = jwtUtils.generateToken(userDetails, user.getFirstName(), user.getLastName());
 
         return ResponseEntity
-                .ok(jwtToken);
+                .ok(new RegisterResponse(jwtToken));
     }
 }

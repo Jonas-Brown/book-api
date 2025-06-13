@@ -8,4 +8,5 @@ export type BookDto  ={
     quantity: number
     bookCover?: string
     bookCoverUrl?: string
+    bookCoverBlobUrl?: string
 }

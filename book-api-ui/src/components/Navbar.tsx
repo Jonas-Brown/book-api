@@ -4,9 +4,7 @@ import { AuthContext } from "../context/AuthContext";
 //TODO add the about page to center screen on desktop
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const { authUser } = useContext(AuthContext);
-
-  const isAdmin = (authUser?.roles || "").includes("ROLE_ADMIN");
+  const { isAdmin } = useContext(AuthContext);
 
   return (
     <nav className="w-full bg-black text-white shadow-2xl">

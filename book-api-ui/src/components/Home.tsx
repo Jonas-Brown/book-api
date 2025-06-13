@@ -15,25 +15,42 @@ const Home = () => {
   const [isDeleteDialogue, setIsDeleteDialogue] = useState(false);
   const [bookToDelete, setBookToDelete] = useState<BookDto | null>(null);
 
-  const { authUser } = useContext(AuthContext);
+  const { isAdmin, authToken } = useContext(AuthContext);
 
-  const isAdmin = (authUser?.roles || "").includes("ROLE_ADMIN");
+  const getImageUrl = useCallback(
+    async (bookCoverUrl: string) => {
+      if (bookCoverUrl === undefined) return undefined;
+      try {
+        const response = await fetch(bookCoverUrl, {
+          method: "GET",
+          headers: { authorization: `Bearer ${authToken}` },
+        });
+
+        const blob = await response.blob();
+        return URL.createObjectURL(blob);
+      } catch (err) {
+        console.error("Error fetching image:", err);
+        return undefined;
+      }
+    },
+    [authToken]
+  );
 
   const getBooks = useCallback(() => {
-    getAllBooks(authUser?.token || "")
+    getAllBooks(authToken || "")
       .then((response) => {
         return response.json();
       })
-      .then((data) => {
-        console.log("Get all books response = ", data);
-        if (!("error" in data)) {
-          setBooks(data);
-        }
+      .then(async (data) => {
+        data.map(async (book: BookDto) => {
+          book.bookCoverBlobUrl = await getImageUrl(book.bookCoverUrl || "");
+        });
+        setBooks(data);
       })
       .catch((error) => {
         console.log("error = ", error);
       });
-  }, [authUser?.token]);
+  }, [authToken, getImageUrl]);
 
   useEffect(() => {
     getBooks();
@@ -61,7 +78,7 @@ const Home = () => {
       submitData.append("file", bookCoverFile);
     }
 
-    updateBook(submitData, updatedBook.isbn, authUser?.token || "")
+    updateBook(submitData, updatedBook.isbn, authToken || "")
       .then((response) => {
         getBooks();
         handleOnCloseEdit();
@@ -81,7 +98,7 @@ const Home = () => {
   };
 
   const handleDelete = (isbn: number) => {
-    deleteBook(isbn, authUser?.token || "")
+    deleteBook(isbn, authToken || "")
       .then((response) => {
         getBooks();
         handleOnCloseDelete();

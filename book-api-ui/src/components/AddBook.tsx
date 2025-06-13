@@ -18,7 +18,7 @@ function AddBook() {
 
   const [bookCoverFile, setBookCoverFile] = useState<File | null>(null);
   const [bookCoverPreview, setBookCoverPreview] = useState<string>("");
-  const context = useContext(AuthContext);
+  const { authToken } = useContext(AuthContext);
 
   const handleFormDataChange = (
     e:
@@ -63,7 +63,7 @@ function AddBook() {
       submitData.append("file", bookCoverFile);
     }
 
-    addBook(submitData, context.authUser?.token || "")
+    addBook(submitData, authToken || "")
       .then((response) => {
         handleReset();
         //navigates back to home page

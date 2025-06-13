@@ -15,7 +15,7 @@ const EditBook = ({ book, isOpen, onClose, onSubmit }: EditBookProps) => {
   //book cover and preview are optional
   const [bookCover, setBookCover] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(
-    book?.bookCoverUrl || null
+    book?.bookCoverBlobUrl || null
   );
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -32,7 +32,6 @@ const EditBook = ({ book, isOpen, onClose, onSubmit }: EditBookProps) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       setBookCover(file);
-
       const reader = new FileReader();
       reader.onloadend = () => {
         setPreviewUrl(reader.result as string);

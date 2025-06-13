@@ -1,14 +1,16 @@
-import { useContext, useState } from "react";
+import { useContext, useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router";
 import { AuthContext } from "../context/AuthContext";
+import { decodeJwt } from "../services/book.service";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
-  const context = useContext(AuthContext);
+  const { setUser, setIsLoggedIn, setIsAdmin, setAuthToken } =
+    useContext(AuthContext);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = (e: FormEvent) => {
     e.preventDefault();
 
     const payload = {
@@ -26,14 +28,24 @@ const LoginPage = () => {
       .then((response) => response.json())
       .then((json) => {
         console.log(json);
-        if (json?.jwtToken) {
-          context.setAuthUser({
-            token: json.jwtToken,
-            email: json.email,
-            roles: json.roles,
+        if (json?.jwt) {
+          setAuthToken(json.jwt);
+          const decodedJwt = decodeJwt(json.jwt);
+          if (decodedJwt === null) return;
+
+          setIsLoggedIn(true);
+          setUser({
+            email: decodedJwt.sub,
+            firstName: decodedJwt.firstName,
+            lastName: decodedJwt.lastName,
           });
+          const isAdmin = decodedJwt.roles.includes("ROLE_ADMIN")
+            ? true
+            : false;
+          setIsAdmin(isAdmin);
+
+          navigate("/");
         }
-        navigate("/");
       })
       .catch((err) => {
         //could add on screen error message

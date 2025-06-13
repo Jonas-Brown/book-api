@@ -5,29 +5,49 @@ type props = {
 };
 
 type User = {
-  token: string;
   email: string;
-  roles: string;
+  firstName: string;
+  lastName: string;
 };
 
 type AuthContextType = {
-  authUser: User | null;
-  setAuthUser: (value: User | null) => void;
+  user: User | null;
+  setUser: (value: User | null) => void;
+  authToken: string | null;
+  setAuthToken: (value: string | null) => void;
+  isLoggedIn: boolean;
+  setIsLoggedIn: (value: boolean) => void;
+  isAdmin: boolean;
+  setIsAdmin: (value: boolean) => void;
 };
 
 const AuthContext = createContext<AuthContextType>({
-  authUser: null,
-  setAuthUser: () => {},
+  user: null,
+  setUser: () => {},
+  authToken: null,
+  setAuthToken: () => {},
+  isLoggedIn: false,
+  setIsLoggedIn: () => {},
+  isAdmin: false,
+  setIsAdmin: () => {},
 });
 
 const AuthProvider = ({ children }: props) => {
-  const [authUser, setAuthUser] = useState<User | null>(null);
-
+  const [user, setUser] = useState<User | null>(null);
+  const [authToken, setAuthToken] = useState<string | null>(null);
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+  const [isAdmin, setIsAdmin] = useState<boolean>(false);
   return (
     <AuthContext
       value={{
-        authUser,
-        setAuthUser,
+        user,
+        setUser,
+        authToken,
+        setAuthToken,
+        isLoggedIn,
+        setIsLoggedIn,
+        isAdmin,
+        setIsAdmin,
       }}
     >
       {children}

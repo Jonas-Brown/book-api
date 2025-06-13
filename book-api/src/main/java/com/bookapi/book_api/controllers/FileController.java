@@ -16,6 +16,7 @@ import java.io.InputStream;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.StreamUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,12 +34,14 @@ public class FileController {
     private String path;
 
     @PostMapping("/upload")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> uploadFile(@RequestPart MultipartFile file) throws IOException {
         String uploadedFileName = fileService.uploadFile(path, file);
         return ResponseEntity.ok("File uploaded is " + uploadedFileName);
     }
 
     @GetMapping(value = "/{filename}", produces = MediaType.IMAGE_PNG_VALUE)
+    @PreAuthorize("hasAnyRole('ADMIN','USER')")
     public void getResource(@PathVariable String filename, HttpServletResponse response) throws IOException {
         InputStream resourceFile = fileService.getResourceFile(path, filename);
         response.setContentType(MediaType.IMAGE_PNG_VALUE);
