@@ -12,6 +12,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,14 +23,11 @@ import com.bookapi.book_api.entities.LibraryUser;
 import com.bookapi.book_api.exception.UserAlreadyExistsException;
 import com.bookapi.book_api.jwt.JwtUtils;
 import com.bookapi.book_api.jwt.LoginRequest;
-import com.bookapi.book_api.jwt.LoginResponse;
 import com.bookapi.book_api.jwt.RegisterRequest;
-import com.bookapi.book_api.jwt.RegisterResponse;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
@@ -67,13 +65,18 @@ public class JwtController {
         // Authenticate the user name and pwd in the database
         final UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         // If username is found for the given password then create jwt token
-        final String jwtToken = jwtUtils.generateToken(userDetails);
-        final List<String> roles = authentication.getAuthorities()
-                .stream()
-                .map(role -> role.getAuthority())
-                .collect(Collectors.toList());
+        Optional<LibraryUser> user = libraryUserRepository.findByEmail(userDetails.getUsername());
+        String firstName = "";
+        String lastName = "";
+        if (user.isPresent()) {
+            firstName = user.get().getFirstName();
+            lastName = user.get().getLastName();
+        } else {
+            throw new UsernameNotFoundException("User not found with email: " + userDetails.getUsername());
+        }
+        final String jwtToken = jwtUtils.generateToken(userDetails, firstName, lastName);
 
-        return ResponseEntity.ok(new LoginResponse(jwtToken, userDetails.getUsername(), roles));
+        return ResponseEntity.ok(jwtToken);
     }
 
     @PostMapping("/signup")
@@ -105,13 +108,9 @@ public class JwtController {
 
         final UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         // If username is found for the given password then create jwt token
-        final String jwtToken = jwtUtils.generateToken(userDetails);
-        final List<String> roles = authentication.getAuthorities()
-                .stream()
-                .map(role -> role.getAuthority())
-                .collect(Collectors.toList());
+        final String jwtToken = jwtUtils.generateToken(userDetails, user.getFirstName(), user.getLastName());
 
         return ResponseEntity
-                .ok(new RegisterResponse(jwtToken, user.getFirstName(), user.getLastName(), user.getEmail(), roles));
+                .ok(jwtToken);
     }
 }

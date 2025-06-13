@@ -16,6 +16,8 @@ import javax.crypto.SecretKey;
 import java.io.Serializable;
 import java.security.Key;
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 @Slf4j
@@ -37,14 +39,21 @@ public class JwtUtils implements Serializable {
         }
     }
 
-    public String generateToken(UserDetails userDetails) {
+    public String generateToken(UserDetails userDetails, String firstName, String lastName) {
         String userName = userDetails.getUsername();
+        List<String> roles = userDetails.getAuthorities()
+                .stream()
+                .map(role -> role.getAuthority())
+                .collect(Collectors.toList());
+
         return Jwts.builder()
                 .subject(userName)
                 .signWith(getSigningKey())
                 .expiration(new Date(System.currentTimeMillis() + Long.parseLong(jwtExpirationInMs)))
                 .issuedAt(new Date(System.currentTimeMillis()))
-                // .claims()
+                .claim("roles", roles)
+                .claim("firstName", firstName)
+                .claim("lastName", lastName)
                 .compact();
     }
 
