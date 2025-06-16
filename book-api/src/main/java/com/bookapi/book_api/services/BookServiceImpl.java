@@ -19,6 +19,8 @@ import com.bookapi.book_api.repositories.BookRepository;
 
 import lombok.RequiredArgsConstructor;
 
+//TODO Change from local file storage to using an API like Cloudinary for images
+// won't have to deal with file issues anymore if you do this
 @Service
 @RequiredArgsConstructor
 public class BookServiceImpl implements BookService {
@@ -126,7 +128,14 @@ public class BookServiceImpl implements BookService {
     public String deleteBook(Long isbn) throws IOException {
         Book book = bookRepository.findById(isbn)
                 .orElseThrow(() -> new BookNotFoundException(("Book not found with isbn: " + isbn)));
-        Files.deleteIfExists(Paths.get(path + File.separator + book.getBookCover()));
+        CompletableFuture.runAsync(() -> {
+            try {
+                Files.deleteIfExists(Paths.get(path + File.separator + book.getBookCover()));
+                System.out.println("Deleteing file: " + book.getBookCover());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
         bookRepository.delete(book);
         return "Book Deleted successfully with isbn : " + isbn;
     }
